@@ -1,5 +1,6 @@
 package com.sunnyweather.android.ui.place
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -14,11 +15,12 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.sunnyweather.android.R
-import com.sunnyweather.android.SunnyWeatherApplication
+import com.sunnyweather.android.logic.model.PlaceViewModel
+import com.sunnyweather.android.ui.weather.WeatherActivity
 
 class PlaceFragment: Fragment() {
     //获取viewModel实例
-    private val viewModel by lazy{ ViewModelProviders.of(this).get(PlaceViewModel::class.java)}
+    val viewModel by lazy{ ViewModelProviders.of(this).get(PlaceViewModel::class.java)}
     private lateinit var adapter: PlaceAdapter
     private lateinit var recycleView: RecyclerView
     private lateinit var inflate: View
@@ -42,6 +44,18 @@ class PlaceFragment: Fragment() {
     //确保与Fragment相关联的Activity已经创建完毕时调用
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
+        //如果进入页面发现地点已经存储到本地文件中则从本地文件中解析出来，并跳转WeatherActivity传值
+        if(viewModel.isPlaceSaved()){
+            val place = viewModel.getSavedPlace()
+            val intent = Intent(context,WeatherActivity::class.java).apply {
+                putExtra("location_lng",place.location.lng)
+                putExtra("location_lat",place.location.lat)
+                putExtra("place_name", place.name)
+            }
+            startActivity(intent)
+            activity?.finish()
+            return
+        }
         //创建线性布局
         val layoutManager = LinearLayoutManager(activity)
         //创建适配器

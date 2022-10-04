@@ -1,5 +1,6 @@
 package com.sunnyweather.android.logic.network
 
+import android.util.Log
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -12,7 +13,16 @@ import kotlin.coroutines.suspendCoroutine
 object SunnyWeatherNetwork {
     //创建一个访问附近地点接口的动态代理对象
     private val placeService = ServiceCreator.create(PlaceService::class.java)
-    //发起搜索城市的数据请求，并将结果映射成一个对象
+    //创建一个访问天气的动态代理对象
+    private val weatherService = ServiceCreator.create(WeatherService::class.java)
+
+    //发起搜索为了几天天气的数据请求，并将结果对象
+    suspend fun getDailyWeather(lng: String, lat: String) =
+        weatherService.getDailyWeather(lng,lat).await()
+    //发起搜索今天的数据请求，并将结果对象
+    suspend fun getRealtimeWeather(lng: String, lat: String) =
+        weatherService.getRealtimeWeather(lng,lat).await()
+    //发起搜索城市的数据请求，并将结果对象
     suspend fun searchPlaces(query: String) = placeService.searchPlaces(query).await()
     //await方法为Call的拓展函数并拥有上下文
     //这样当执行enqueue方法是会在子线程请求数据，完成后会切到主线程回调Callback
@@ -24,7 +34,9 @@ object SunnyWeatherNetwork {
                 override fun onResponse(call: Call<T>, response: Response<T>) {
                     val body = response.body()
                     //如果数据不为空将则恢复被挂起的协程，并传入服务器相应的数据，此值会成为suspendCoroutine函数的返回值
-                    if (body !=null) it.resume(body)
+                    if (body !=null) {
+                        it.resume(body)
+                    }
                     else it.resumeWithException(
                         RuntimeException("response body is null")
                     )
