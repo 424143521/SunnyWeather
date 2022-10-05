@@ -1,13 +1,18 @@
 package com.sunnyweather.android.ui.weather
 
+import android.content.Context
 import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
+import android.view.inputmethod.InputMethodManager
 import android.widget.*
+import androidx.core.view.GravityCompat
+import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.sunnyweather.android.R
 import com.sunnyweather.android.logic.model.Sky
 import com.sunnyweather.android.logic.model.Weather
@@ -29,6 +34,9 @@ class WeatherActivity : AppCompatActivity() {
     lateinit var ultravioletText: TextView
     lateinit var carWashingText: TextView
     lateinit var weatherLayout: ScrollView
+    lateinit var swipeRefresh: SwipeRefreshLayout
+    lateinit var navBtn: Button
+    lateinit var drawerLayout: DrawerLayout
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         //融合状态栏
@@ -52,6 +60,9 @@ class WeatherActivity : AppCompatActivity() {
         ultravioletText = findViewById(R.id.ultravioletText)
         carWashingText = findViewById(R.id.carWashingText)
         weatherLayout = findViewById(R.id.weaterLayout)
+        swipeRefresh = findViewById(R.id.swipeRefresh)
+        navBtn = findViewById(R.id.navBtn)
+        drawerLayout = findViewById(R.id.drawerLayout)
         //如果第一次为空则在intent中读取
         if(viewModel.locationLng.isEmpty()){
             viewModel.locationLng = intent.getStringExtra("location_lng") ?: ""
@@ -73,11 +84,46 @@ class WeatherActivity : AppCompatActivity() {
                 Toast.makeText(this,"无法成功获取天气信息", Toast.LENGTH_SHORT).show()
                 result.exceptionOrNull()?.printStackTrace()
             }
+            swipeRefresh.isRefreshing = false
+        })
+        swipeRefresh.setColorSchemeResources(com.google.android.material.R.color.design_default_color_primary)
+        refreshWeather()
+        //下拉时刷新天气
+        swipeRefresh.setOnRefreshListener {
+            refreshWeather()
+        }
+        navBtn.setOnClickListener {
+            //打开滑动菜单
+            drawerLayout.openDrawer(GravityCompat.START)
+        }
+
+        //监听drawerLayout的状态
+        drawerLayout.addDrawerListener(object : DrawerLayout.DrawerListener{
+            override fun onDrawerSlide(drawerView: View, slideOffset: Float) {
+            }
+
+            override fun onDrawerOpened(drawerView: View) {
+            }
+
+            //当活动菜单被隐藏时也要隐藏输入法
+            override fun onDrawerClosed(drawerView: View) {
+                val manager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                manager.hideSoftInputFromWindow(drawerView.windowToken,InputMethodManager.HIDE_NOT_ALWAYS)
+            }
+
+            override fun onDrawerStateChanged(newState: Int) {
+            }
+
         })
         //改变locationLiveData的值并改变weatherLiveData的值
         viewModel.refreshWeather(viewModel.locationLng,viewModel.locationLat)
     }
 
+    //刷新天气
+    fun refreshWeather(){
+        viewModel.refreshWeather(viewModel.locationLng,viewModel.locationLat)
+        swipeRefresh.isRefreshing =true
+    }
     //进行解析与展示
     private fun showWeatherInfo(weather : Weather) {
         placeName.text = viewModel.placeName
