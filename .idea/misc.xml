@@ -3,6 +3,7 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/SunnyWeather/app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.194" />
         <entry key="..\:/SunnyWeather/app/src/main/res/layout/activity_main.xml" value="0.221875" />
         <entry key="..\:/SunnyWeather/app/src/main/res/layout/activity_weather.xml" value="0.23489583333333333" />
         <entry key="..\:/SunnyWeather/app/src/main/res/layout/forecast.xml" value="0.2484375" />

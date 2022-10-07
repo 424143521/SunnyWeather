@@ -100,6 +100,7 @@ class WeatherActivity : AppCompatActivity() {
         //监听drawerLayout的状态
         drawerLayout.addDrawerListener(object : DrawerLayout.DrawerListener{
             override fun onDrawerSlide(drawerView: View, slideOffset: Float) {
+
             }
 
             override fun onDrawerOpened(drawerView: View) {

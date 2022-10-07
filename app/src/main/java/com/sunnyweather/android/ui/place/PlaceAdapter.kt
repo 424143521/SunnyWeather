@@ -27,7 +27,6 @@ class PlaceAdapter(private val fragment: PlaceFragment, private val placeList: L
             val position = holder.adapterPosition
             val place = placeList[position]
             val activity = fragment.activity
-            //如果当前的活动是在WeatherActivity则直接刷新天气
             if(activity is WeatherActivity){
                 activity.drawerLayout.closeDrawers()
                 activity.viewModel.locationLng = place.location.lng

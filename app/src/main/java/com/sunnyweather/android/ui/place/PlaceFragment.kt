@@ -46,7 +46,7 @@ class PlaceFragment: Fragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         //如果进入页面发现地点已经存储到本地文件中则从本地文件中解析出来，并跳转WeatherActivity传值
-        if(activity is MainActivity && viewModel.isPlaceSaved()){
+        if(activity is MainActivity&&viewModel.isPlaceSaved()){
             val place = viewModel.getSavedPlace()
             val intent = Intent(context,WeatherActivity::class.java).apply {
                 putExtra("location_lng",place.location.lng)
